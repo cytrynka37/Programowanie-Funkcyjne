@@ -24,15 +24,14 @@ let halve lst =
   in 
   helper lst [] lst
 
-let rec merge_sort xs =
+let rec merge_sort cmp xs =
   match xs with
   | [] -> []
   | [x] -> [x]
   | _ -> 
-    let (left, right) = halve xs in
-    let right_sorted = merge_sort right in
-    let left_sorted = merge_sort left in
-    merge (<) left_sorted right_sorted
+    let (left, right) = halve xs 
+  in
+  merge cmp (merge_sort cmp right) (merge_sort cmp left)
     
 
 let merge_tail2 cmp ls1 ls2 =
@@ -55,4 +54,5 @@ let rec merge_sort2 cmp xs =
   | _ ->
       let left, right = halve xs
       in let ncmp = fun a b -> not ((cmp) a b)
-      in (merge_tail2 ncmp (merge_sort2 ncmp left) (merge_sort2 ncmp right))
+      in 
+      (merge_tail2 ncmp (merge_sort2 ncmp left) (merge_sort2 ncmp right))
