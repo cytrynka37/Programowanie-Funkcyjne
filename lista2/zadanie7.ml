@@ -26,5 +26,3 @@ let remove h =
 
 let h1 = Node (4, Node (19, Leaf, Leaf, 0), Node (8, Leaf, Leaf, 0), 1)
 let h2 = Node (6, Node (8, Leaf, Leaf, 0), Node (7, Leaf, Leaf, 0), 1)
-let h3 = Node (5, Node (12, Node (13, Leaf, Leaf, 0), Node (19, Leaf, Leaf, 0), 1), Leaf, 0)
-let h4 = Node (6, Node (7, Node (8, Leaf, Leaf, 0), Node (9, Leaf, Leaf, 0), 1), Node (10, Leaf, Leaf, 0), 1)
