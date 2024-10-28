@@ -68,19 +68,19 @@ let bot_e f thm =
 
 (* Dowody *)
 
-let proof1 = imp_i (Var "p") (by_assumption (Var "p"))
+let p = Var "p"
+let q = Var "q"
+let r = Var "r"
+let proof1 = imp_i p(by_assumption p)
 
-let proof2 = 
-  let p = Var "p" in
-  let q = Var "q" in
-  imp_i p (imp_i q (by_assumption p))
+let proof2 = imp_i p (imp_i q (by_assumption p))
 
 let proof3 =
-  imp_i (Impl (Var "p", Impl (Var "q", Var "r")))
-  (imp_i (Impl (Var "p", Var "q"))
-    (imp_i (Var "p")
+  imp_i (Impl (p, Impl (q, r)))
+  (imp_i (Impl (p, q))
+    (imp_i p
       (imp_e
-        (imp_e (by_assumption (Impl (Var "p", Impl(Var "q", Var "r")))) (by_assumption (Var "p")))
-        (imp_e (by_assumption (Impl (Var "p", Var "q"))) (by_assumption (Var "p"))))))
+        (imp_e (by_assumption (Impl (p, Impl (q, r)))) (by_assumption p))
+        (imp_e (by_assumption (Impl (p, q))) (by_assumption p)))))
 
-let proof4 = imp_i False (bot_e (Var "p") (by_assumption False))
+let proof4 = imp_i False (bot_e p (by_assumption False))
