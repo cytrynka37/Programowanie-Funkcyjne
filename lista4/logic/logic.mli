@@ -49,11 +49,3 @@ val imp_e : theorem -> theorem -> theorem
   -----(⊥E)
   Γ ⊢ f *)
 val bot_e : formula -> theorem -> theorem
-
-val proof1 : theorem
-
-val proof2 : theorem
-
-val proof3 : theorem
-
-val proof4 : theorem
