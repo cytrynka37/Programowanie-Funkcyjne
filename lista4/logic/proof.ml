@@ -25,44 +25,16 @@ let goal pf =
   match pf with
   | PComplete _ -> None
   | PActive (PTGoal (assumptions, formula), _) -> Some (assumptions, formula)
-  | _ -> failwith "Unexpected proof structure: the proof should only have one active goal."
+  | _ -> failwith "There is no goal"
 
 
 let qed pf =
   match pf with
   | PComplete thm -> thm
-  | _ -> failwith "Incomplete proof"
+  | _ -> failwith "Incomplete proof" 
 
-(* let rec move_down pt =
-  match pt with
-  | PTGoal g -> Some g
-  | PTImpI (_, st) | PTBotE (_, st) -> move_down st
-  | PTImpE (_, left, right) ->
-    (match move_down left with
-    | Some goal -> Some goal
-    | None -> move_down right)
-  | PTComplete _ -> None
-
-let rec move_up ctx =
-  match ctx with
-  | Root -> None
-  | CImpI (pctx, pt) | CBotE (pctx, pt) -> Some (pctx, pt)
-  | CImpE (pctx, left, right) -> 
-    (match move_down right with
-    | Some goal -> Some (CImpE (pctx, left, right), PTGoal goal)
-    | None -> move_up pctx)*)
-
-let next pf = failwith "not im"
-  (* match pf with
-  | PComplete _ -> pf
-  | PActive (goal, ctx) ->
-    (match move_down goal with
-    | Some new_goal -> PActive (PTGoal new_goal, ctx)
-    | None -> (match move_up ctx with
-              | Some (new_ctx, new_pt) -> PActive (goal, new_ctx)
-              | None -> pf)) *) 
-
-exception NotAnImplication
+let next pf = failwith "not implemented" 
+              
 let intro (name: string) (p: proof) : proof =
   match p with
   | PComplete th -> PComplete th 
@@ -71,7 +43,7 @@ let intro (name: string) (p: proof) : proof =
       | PTGoal (assump, Impl (f, g)) -> 
           let new_subtree = PTGoal ((name, f) :: assump, g)
           in PActive (new_subtree, CImpI (ctx, PTImpI (Impl (f, g), new_subtree))) 
-      | _ -> raise NotAnImplication 
+      | _ -> failwith "Not an implication" 
 
 let apply f pf =
   (* TODO: zaimplementuj *)
