@@ -6,7 +6,7 @@ and 'a mylazy_state =
 
 let force (x : 'a mylazy) : 'a =
   match !x with 
-  | Evaluating -> failwith "err"
+  | Evaluating -> failwith "evaluating"
   | Evaluated v -> v
   | Unevaluated f ->
     x := Evaluating;
@@ -15,53 +15,43 @@ let force (x : 'a mylazy) : 'a =
 let fix (f : 'a mylazy -> 'a) : 'a mylazy =
   let rec i = ref (Unevaluated (fun () -> f i)) in i
 
-(* Typ leniwej listy *)
-type 'a lazy_list = 
+type 'a llist = 
   | Nil
-  | Cons of 'a * 'a lazy_list mylazy
+  | Cons of 'a * 'a llist mylazy
 
-  (* Funkcja do pobrania głowy leniwej listy *)
-let head = function
-| Nil -> failwith "Empty list"
-| Cons (h, _) -> h
+let rec nats n = fix (fun _ -> Cons (n, nats (n + 1)))
 
-(* Funkcja do pobrania ogona leniwej listy *)
-let tail = function
-| Nil -> failwith "Empty list"
-| Cons (_, t) -> force t
+let rec filter p xs =
+  fix (fun _ ->
+    match force xs with
+    | Nil -> Nil
+    | Cons (x, xs') when p x -> Cons (x, filter p xs')
+    | Cons (_, xs') -> force (filter p xs'))
 
-(* Funkcja generująca nieskończoną leniwą listę liczb od zadanego punktu *)
-let rec from n =
-Cons (n, ref (Unevaluated (fun () -> from (n + 1))))
+let rec take_while p xs =
+  fix (fun _ ->
+  match force xs with
+  | Cons (x, ys) when p x -> Cons(x, take_while p ys)
+  | _ -> Nil)
+let rec for_all p xs =
+  force (fix (fun _ ->
+  match force xs with
+  | Nil -> true
+  | Cons (x, xs') -> p x && for_all p xs'))
 
-
-(* Funkcja filtrująca elementy leniwej listy zgodnie z predykatem *)
-let rec filter p = function
-  | Nil -> Nil
-  | Cons (h, t) ->
-      if p h then Cons (h, ref (Unevaluated (fun () -> filter p (force t))))
-      else filter p (force t)
-
-(* Funkcja tworząca leniwą listę liczb pierwszych *)
-let rec sieve = function
-  | Nil -> Nil
-  | Cons (p, t) ->
-      Cons (p, ref (Unevaluated (fun () ->
-        sieve (filter (fun x -> x mod p <> 0) (force t)))))
-        
-(* Lista wszystkich liczb pierwszych, zaczynająca się od 2 *)
-let primes = sieve (from 2)
-
-
-
-(* Funkcja pobierająca pierwsze n elementów z leniwej listy *)
-let rec take n = function
+let primes =
+  fix (fun primes ->
+    let is_prime n =
+      primes
+      |> take_while (fun p -> p * p <= n)
+      |> for_all (fun p -> n mod p <> 0)
+    in
+    Cons(2, filter is_prime (nats 3)))
+  
+let rec to_list ls =
+  match force ls with
   | Nil -> []
-  | Cons (h, t) ->
-      if n <= 0 then []
-      else h :: take (n - 1) (force t)
+  | Cons(x, xs) -> x :: to_list xs
+  
 
-(* Wyświetlenie pierwszych 10 liczb pierwszych *)
-let () =
-  let first_10_primes = take 10 primes in
-  List.iter (Printf.printf "%d ") first_10_primes
+let res = to_list (take_while ((>) 100) primes);;
